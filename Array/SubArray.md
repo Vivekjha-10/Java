@@ -1,106 +1,140 @@
-🔎 What is a Subarray?
+Brute Force (O(n³))
 
-👉 Subarray = Continuous (lagataar) portion of an array.
+Prefix Sum (O(n²))
 
-Ek array ke andar se hum ek particular continuous sequence nikaalte हैं, usse subarray bolte हैं.
+Kadane’s Algorithm (O(n))
 
-Elements ka order change nahi hota.
+Chalo step by step samjhate hain.
 
-Elements skip nahi kar sakte.
+🔹 1. Brute Force Method (O(n³))
 
-✅ Example
+Idea:
 
-Array: nums = [1, 2, 3]
+Har possible subarray check karo.
 
-Possible subarrays:
+Har subarray ka sum calculate karo.
 
-[1]
+Max sum update karte raho.
 
-[1, 2]
+Code:
 
-[1, 2, 3]
+public static void maxSumSubArrayBrute(int numbers[]) {
+    int maxSum = Integer.MIN_VALUE;
 
-[2]
+    for (int i = 0; i < numbers.length; i++) {       // start
+        for (int j = i; j < numbers.length; j++) {   // end
+            int currSum = 0;
 
-[2, 3]
-
-[3]
-
-👉 Total subarrays = n*(n+1)/2 (yahan n=3 → 6 subarrays).
-
-⚠️ {1, 3} subarray nahi hai, kyunki wo continuous nahi hai.
-
-🔄 Difference between Subarray, Substring, Subsequence
-
-Subarray → continuous portion of array
-
-Substring → continuous portion of string (same as subarray but for strings)
-
-Subsequence → order same, but elements skip kar sakte ho
-
-Example with [1, 2, 3]
-
-Subarrays: [1, 2], [2, 3] ✅
-
-Subsequences: [1, 3] (allowed) ❌ subarray
-
-🔢 Formula for Number of Subarrays
-
-For an array of length n:
-👉 Total subarrays = n * (n + 1) / 2
-
-Example:
-
-n = 5 → total subarrays = 5 * 6 / 2 = 15
-
-🧑‍💻 Example Code to Print Subarrays
-public class SubArrayExample {
-    public static void printSubarrays(int[] arr) {
-        int n = arr.length;
-
-        for (int start = 0; start < n; start++) {
-            for (int end = start; end < n; end++) {
-                System.out.print("[ ");
-                for (int k = start; k <= end; k++) {
-                    System.out.print(arr[k] + " ");
-                }
-                System.out.println("]");
+            for (int k = i; k <= j; k++) {           // sum
+                currSum += numbers[k];
             }
+
+            maxSum = Math.max(maxSum, currSum);
         }
     }
 
-    public static void main(String[] args) {
-        int[] nums = {1, 2, 3};
-        printSubarrays(nums);
-    }
+    System.out.println("Max Sum (Brute) = " + maxSum);
 }
 
-Output:
-[ 1 ]
-[ 1 2 ]
-[ 1 2 3 ]
-[ 2 ]
-[ 2 3 ]
-[ 3 ]
 
-⚡ Why are Subarrays Important?
+Time Complexity:
 
-Subarray concept bahut saare algorithms me use hota hai, jaise:
+3 loops → O(n³)
 
-Maximum Subarray Sum → (Kadane’s Algorithm)
+Very slow for large arrays.
 
-Sliding Window Problems
+🔹 2. Prefix Sum Method (O(n²))
 
-Prefix Sum / Subarray Sum Queries
+Idea:
 
-Dynamic Programming Problems
+Ek prefix array banao jisme har index tak ka cumulative sum stored ho.
 
-🏁 Summary
+Formula:
 
-Subarray = continuous portion of array
+subarraySum(i...j) = prefix[j] - prefix[i-1]
+(agar i=0 ho to sirf prefix[j])
 
-Total subarrays = n*(n+1)/2
 
-Subarray vs Subsequence → subarray continuous hota hai, subsequence me skip allowed hai.
+Isse inner loop (sum nikalne wala) remove ho jata hai.
 
-Coding me iska use hota hai sum, max/min, sliding window, prefix sum jaise problems me.
+Code:
+
+public static void maxSumSubArrayPrefix(int numbers[]) {
+    int n = numbers.length;
+    int prefix[] = new int[n];
+
+    prefix[0] = numbers[0];
+    for (int i = 1; i < n; i++) {
+        prefix[i] = prefix[i - 1] + numbers[i];
+    }
+
+    int maxSum = Integer.MIN_VALUE;
+
+    for (int i = 0; i < n; i++) {          // start
+        for (int j = i; j < n; j++) {      // end
+            int currSum = i == 0 ? prefix[j] : prefix[j] - prefix[i - 1];
+            maxSum = Math.max(maxSum, currSum);
+        }
+    }
+
+    System.out.println("Max Sum (Prefix) = " + maxSum);
+}
+
+
+Time Complexity:
+
+2 loops → O(n²)
+
+Faster than brute force.
+
+🔹 3. Kadane’s Algorithm (O(n)) ✅
+
+Idea:
+
+Ek hi loop mein max subarray sum nikal lo.
+
+Har step par decide karo:
+
+Current element ko existing subarray mein add karna hai?
+
+Ya naya subarray start karna hai?
+
+Agar currSum < 0 ho jaata hai, reset kar do.
+
+Code:
+
+public static void kadane(int numbers[]) {
+    int currSum = 0;
+    int maxSum = Integer.MIN_VALUE;
+
+    for (int i = 0; i < numbers.length; i++) {
+        currSum += numbers[i];
+        maxSum = Math.max(maxSum, currSum);
+
+        if (currSum < 0) {
+            currSum = 0;
+        }
+    }
+
+    System.out.println("Max Sum (Kadane) = " + maxSum);
+}
+
+
+Time Complexity:
+
+Single loop → O(n)
+
+Best approach for large arrays.
+
+🔹 Example Run
+
+Array = {1, -1, 6, -1, 3}
+
+Brute Force → checks all subarrays → max = 8
+
+Prefix Sum → uses prefix[] → max = 8
+
+Kadane’s Algorithm → smart reset → max = 8
+
+👉 Output sabka same, lekin speed different.
+
